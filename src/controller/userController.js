@@ -4,13 +4,56 @@ const {
   deleteUserById,
   updateUserById,
   checkDuplicateEmail,
+  getTotalUsersCount,
+  getSearchUser,
 } = require("../models/userModel");
 
 // @desc    Fetch all products
 // @routes  GET /users
 const getUsers = async (req, res) => {
   try {
-    const [data] = await getAllUsers();
+    const { page, keyword } = req.query;
+    const perPage = 10;
+
+    let data;
+    let totalData;
+    let totalPage;
+    if (keyword) {
+      const [searchData] = await getSearchUser(keyword, page, perPage);
+      data = searchData;
+      // Hitung Total Data
+      const [totalCount] = await getTotalUsersCount();
+      totalData = totalCount[0].count;
+      totalPage = Math.ceil(totalData / perPage);
+    } else {
+      const [dataUsers] = await getAllUsers(page, perPage);
+      data = dataUsers;
+      // Hitung Total Page
+      const [totalCount] = await getTotalUsersCount();
+      totalData = totalCount[0].count;
+      totalPage = Math.ceil(totalData / perPage);
+    }
+
+    res.status(200).json({
+      status: "OK",
+      data: data,
+      totalPages: totalPage,
+      currentPage: Number(page),
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server Error 500",
+      serverMessage: error,
+    });
+  }
+};
+
+// @desc    Search users by keyword
+// @routes  GET /users/search?keyword=xxx
+const searchUser = async (req, res) => {
+  const { keyword } = req.query;
+  try {
+    const [data] = await getSearchUser(keyword);
     res.status(200).json({
       status: "OK",
       data: data,
@@ -32,6 +75,11 @@ const postUser = async (req, res) => {
   if (isEmailDuplicate) {
     return res.status(400).json({ message: "Email already exists" });
   }
+
+  if (!body.name || !body.email || !body.address) {
+    return res.status(400).json({ message: "Data anda tidak memenuhi syarat" });
+  }
+
   try {
     await postNewUser(body);
     res.status(201).json({
@@ -85,6 +133,7 @@ const deleteUser = async (req, res) => {
 
 module.exports = {
   getUsers,
+  searchUser,
   postUser,
   updateUser,
   deleteUser,

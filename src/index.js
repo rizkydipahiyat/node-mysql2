@@ -2,6 +2,7 @@ const express = require("express");
 const userRoutes = require("./routes/userRoutes");
 const middlewareRequest = require("./middleware/logs");
 const upload = require("./middleware/multer");
+const extractPage = require("./middleware/page");
 require("dotenv").config();
 
 const app = express();
@@ -10,6 +11,7 @@ const PORT = process.env.PORT || 4000;
 app.use(express.json());
 
 app.use(middlewareRequest);
+app.use(extractPage);
 
 app.use("/img", express.static("uploads"));
 
