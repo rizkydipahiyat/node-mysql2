@@ -4,8 +4,16 @@ const middlewareRequest = require("./middleware/logs");
 const upload = require("./middleware/multer");
 const extractPage = require("./middleware/page");
 require("dotenv").config();
+const cors = require("cors");
 
 const app = express();
+app.use(
+  cors({
+    origin: ["https://node-mysql2.vercel.app"],
+    methods: ["*"],
+    credentials: true,
+  })
+);
 const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
