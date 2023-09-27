@@ -10,7 +10,7 @@ const app = express();
 app.use(
   cors({
     origin: ["https://node-mysql2.vercel.app"],
-    methods: ["*"],
+    methods: ["POST", "GET", "DELETE", "PATCH"],
     credentials: true,
   })
 );
@@ -21,8 +21,8 @@ app.use(express.json());
 app.use(middlewareRequest);
 app.use(extractPage);
 
-app.use("/", (req, res) => {
-  res.send("Server is running");
+app.get("/", (req, res) => {
+  res.json("Server is running");
 });
 
 app.use("/img", express.static("uploads"));
