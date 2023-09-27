@@ -21,6 +21,10 @@ app.use(express.json());
 app.use(middlewareRequest);
 app.use(extractPage);
 
+app.use("/", (req, res) => {
+  res.send("Server is running");
+});
+
 app.use("/img", express.static("uploads"));
 
 app.use("/users", userRoutes);
