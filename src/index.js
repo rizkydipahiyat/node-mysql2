@@ -16,10 +16,16 @@ app.use(extractPage);
 app.use("/img", express.static("uploads"));
 
 app.use("/users", userRoutes);
-app.post("/upload", upload.single("image"), (req, res) => {
+app.post("/upload", upload.array("image"), (req, res) => {
+  const urls = [];
+  const { files } = req;
+  for (const file of files) {
+    const { filename } = file;
+    urls.push(`/img/${filename}`);
+  }
   res.status(200).json({
     status: "Created",
-    message: "Upload Successfully",
+    message: urls,
   });
 });
 
